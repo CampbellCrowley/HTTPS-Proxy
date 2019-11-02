@@ -1,0 +1,23 @@
+{
+  "name": "httpsproxy",
+  "version": "1.0.0",
+  "description": "HTTPS to HTTP proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CampbellCrowley/HTTPS-Proxy.git"
+  },
+  "author": "Campbell Crowley",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/CampbellCrowley/HTTPS-Proxy/issues"
+  },
+  "homepage": "https://github.com/CampbellCrowley/HTTPS-Proxy#readme",
+  "dependencies": {
+    "http-proxy": "^1.18.0"
+  }
+}
