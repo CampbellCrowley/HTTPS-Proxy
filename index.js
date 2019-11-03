@@ -122,8 +122,8 @@ if (server) {
         },
         (e) => {
           if (e) {
-            common.error('Error in proxying request: ' + req.url, ip);
-            console.error(e);
+            common.error(
+                'Error in proxying request: ' + req.url + ' ' e.message, ip);
             res.writeHead(400);
             res.end();
           }
