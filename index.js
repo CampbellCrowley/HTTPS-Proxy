@@ -124,6 +124,8 @@ if (server) {
           if (e) {
             common.error('Error in proxying request: ' + req.url, ip);
             console.error(e);
+            res.writeHead(400);
+            res.end();
           }
         });
   });
