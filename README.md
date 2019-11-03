@@ -41,3 +41,6 @@ This can attempt to also manage Let's Encrypt Certbot verification requests via
 HTTP. This means we will attempt to bind to `--verification-port=##`, and serve
 files from `./.well-known/` as they are requested. It is recommended to use
 `--out=80` to change the output forwarding port in this case.
+
+`--are-you-up=/areyouup` reply to all requests with where the url exactly
+matches the given path, with "Yes".

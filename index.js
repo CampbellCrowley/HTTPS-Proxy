@@ -80,11 +80,22 @@ const outputPort = outArg ? outArg.split('=').slice(1).join('=') * 1 : 80;
 
 const noPrepend = process.argv.find((el) => el === '--disable-domain-prepend');
 const noQueries = process.argv.find((el) => el === '--disable-header-queries');
+const areYouUpArg = process.argv.find((el) => el.startsWith('--are-you-up='));
+let areYouUp = '';
+if (areYouUpArg) {
+  areYouUp = areYouUpArg.split('=').slice(1).join('=');
+}
 
 if (server) {
   server.on('request', (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
         req.socket.remoteAddress || 'ERRR';
+
+    if (areYouUpArg && req.url === areYouUp) {
+      res.writeHead(200);
+      res.end('Yes');
+      return;
+    }
 
     const headers = {'x-forwarded-for': ip};
     let queries = '';
