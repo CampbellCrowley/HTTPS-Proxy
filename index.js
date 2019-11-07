@@ -80,6 +80,7 @@ const outputPort = outArg ? outArg.split('=').slice(1).join('=') * 1 : 80;
 
 const noPrepend = process.argv.find((el) => el === '--disable-domain-prepend');
 const noQueries = process.argv.find((el) => el === '--disable-header-queries');
+const removeQueries = process.argv.find((el) => el === '--remove-queries');
 const areYouUpArg = process.argv.find((el) => el.startsWith('--are-you-up='));
 let areYouUp = '';
 if (areYouUpArg) {
@@ -99,7 +100,7 @@ if (server) {
 
     const headers = {'x-forwarded-for': ip};
     let queries = '';
-    if (req.url.indexOf('?') >= 0) {
+    if (removeQueries && req.url.indexOf('?') >= 0) {
       const split = req.url.split('?');
       req.url = split[0];
       queries = split[1];
@@ -135,7 +136,7 @@ if (server) {
 
     const headers = {'x-forwarded-for': ip};
     let queries = '';
-    if (req.url.indexOf('?') >= 0) {
+    if (removeQueries && req.url.indexOf('?') >= 0) {
       const split = req.url.split('?');
       req.url = split[0];
       queries = split[1];
