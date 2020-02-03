@@ -23,6 +23,7 @@ All other headers will be forwarded as-is with the proxied request.
 requested URL path.
 
 `--disable-header-queries` will disable setting the `Queries` header.
+`--remove-queries` will remove everything from the URL following the first `?`.
 
 `--dir=/etc/letsencrypt/live/kamino.spikeybot.com/` can be used to change the
 default path to search for keys and certs.
