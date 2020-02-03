@@ -1,0 +1,12 @@
+[
+  ["/socket.io/child/dev/hg/", 8013],
+  ["/socket.io/child/hg/", 8011],
+  ["/socket.io/child/dev/account/", 8015],
+  ["/socket.io/child/account/", 8014],
+  ["/socket.io/child/dev/control/", 8021],
+  ["/socket.io/child/control/", 8020],
+  ["/socket.io/master/", 8024],
+  ["/socket.io/dev/master/", 8025],
+  ["/master/", 8024],
+  ["/dev/master/", 8025]
+]

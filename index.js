@@ -1,4 +1,4 @@
-// Copyright 2019 Campbell Crowley. All rights reserved.
+// Copyright 2019-2020 Campbell Crowley. All rights reserved.
 // Author: Campbell Crowley (web@campbellcrowley.com)
 
 let common;
@@ -20,6 +20,8 @@ const httpProxy = require('http-proxy');
 const https = require('https');
 let server;
 let watchFile = null;
+let portMap = [];
+const portMapFile = path.resolve(`${__dirname}/portMap.json`);
 
 const pathArg = process.argv.find((el) => el.startsWith('--dir='));
 const keyPath = pathArg && pathArg.split('=').splice(1).join('=');
@@ -73,6 +75,26 @@ if (watchFile) {
     }, 1000);
   });
 }
+function readPortMap() {
+  fs.readFile(portMapFile, (err, data) => {
+    if (err) {
+      if (err.code === 'ENOENT') return;
+      common.logWarning('Failed to read portMap.json');
+      console.error(err);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(data);
+      portMap = parsed;
+    } catch (err) {
+      common.error('Failed to parse portMap.json');
+      console.error(err);
+      return;
+    }
+  });
+}
+readPortMap();
+fs.watchFile(portMapFile, {persistent: false}, readPortMap);
 const inArg = process.argv.find((el) => el.startsWith('--in='));
 const outArg = process.argv.find((el) => el.startsWith('--out='));
 const listenPort = inArg ? inArg.split('=').slice(1).join('=') * 1 : 443;
@@ -114,16 +136,23 @@ if (server) {
       }
       req.url = `/${subDomain}${req.url}`;
     }
-    common.log(`  : ${req.headers.host}${req.url}`, ip);
+    let finalPort = outputPort;
+    for (let p of portMap) {
+      if (req.url.startsWith(p[0])) {
+        finalPort = p[1];
+        break;
+      }
+    }
+    common.log(`  : ${req.headers.host}:${finalPort}${req.url}`, ip);
     proxy.web(
         req, res, {
-          target: {host: 'localhost', port: outputPort},
+          target: {host: 'localhost', port: finalPort},
           headers: headers,
         },
         (e) => {
           if (e) {
             common.error(
-                'Error in proxying request: ' + req.url + ' ' + e.message, ip);
+                `Failed to proxy: ${req.url} (${finalPort}) ${e.message}`, ip);
             res.writeHead(400);
             res.end();
           }
@@ -150,21 +179,29 @@ if (server) {
       }
       req.url = `/${subDomain}${req.url}`;
     }
-    common.log(`WS: ${req.headers.host}${req.url}`, ip);
+    let finalPort = outputPort;
+    for (let p of portMap) {
+      if (req.url.startsWith(p[0])) {
+        finalPort = p[1];
+        break;
+      }
+    }
+    common.log(`WS: ${req.headers.host}:${finalPort}${req.url}`, ip);
     proxy.ws(req, socket, head, {
-      target: {host: 'localhost', port: outputPort},
+      target: {host: 'localhost', port: finalPort},
       headers: headers,
     });
   });
-  server.on('error', (e) => common.error(e));
-  common.logDebug(`HTTPS Listening on port ${listenPort}`);
-  server.listen(listenPort, '::');
   common.logDebug(`Proxying to port ${outputPort}`);
   const proxy = httpProxy.createProxyServer({ws: true});
   proxy.on('error', (e) => {
     common.error(e.message);
     if (e.message.indexOf('ENOTFOUND') == -1) console.log(e);
   });
+
+  server.on('error', (e) => common.error(e));
+  common.logDebug(`HTTPS Listening on port ${listenPort}`);
+  server.listen(listenPort, '::');
 }
 
 const portArg =
